@@ -11,6 +11,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.glu.GLU;
 
+import de.confuse.openGL.gui.Gui;
 import de.confuse.openGL.gui.GuiScreen;
 import de.confuse.openGL.util.MouseUtil;
 import de.confuse.openGL.util.Time;
@@ -24,6 +25,8 @@ public class Window
 	 * <code>null</code> as the parent ({@link GuiScreen#getParentScreen()}).
 	 */
 	public static Class<? extends GuiScreen> default_Screen = null;
+
+	public static float scaleX, scaleY;
 
 	/** The title of the Window */
 	private String title;
@@ -79,6 +82,7 @@ public class Window
 		{
 			checkGlError();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			checkDisplay();
 
 			// -------------------------------
 			// --- Checking hardware input ---
@@ -96,6 +100,7 @@ public class Window
 			if (currentScreen != null && deltaT >= 0)
 				currentScreen.update(deltaT, Mouse.getX(), MouseUtil.getInvertedMouseY());
 
+//			System.out.println(scaleX + " | " + scaleY);
 			// ----------------------------------
 			// --- Flushing buffers to Screen ---
 			// ----------------------------------
@@ -167,6 +172,38 @@ public class Window
 					currentScreen.mouseScrollIncreased(wheel);
 			}
 
+		}
+
+	}
+
+	private void checkDisplay()
+	{
+		if (Display.wasResized())
+		{
+			Window.scaleX = (float) ((float) this.width / (float) this.inputWidth);
+			Window.scaleY = (float) ((float) this.height / (float) this.inputHeight);
+
+			this.width = Display.getWidth();
+			this.height = Display.getHeight();
+
+			if (Display.wasResized())
+			{
+//				try
+				{
+//					Display.setDisplayMode(new DisplayMode(this.width, this.height));
+					glViewport(0, 0, this.width, this.height);
+					Gui.pushAttrib();
+					Gui.pushMatrix();
+					glOrtho(0, this.width, this.height, 0, 1, -1);
+					Gui.popAttrib();
+					Gui.popMatrix();
+				}
+//				catch (LWJGLException e)
+				{
+					// TODO Auto-generated catch block
+//					e.printStackTrace();
+				}
+			}
 		}
 
 	}
@@ -246,6 +283,7 @@ public class Window
 			}
 
 		this.currentScreen = guiScreen;
+		this.currentScreen.screenRefocused();
 	}
 
 	public static Window get(String windowName, int width, int height, boolean fullscreen, boolean resizeable)
