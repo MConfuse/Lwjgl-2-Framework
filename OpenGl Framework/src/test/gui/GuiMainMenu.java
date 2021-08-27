@@ -1,6 +1,7 @@
 package test.gui;
 
 import org.lwjgl.input.Keyboard;
+
 import de.confuse.openGL.gui.GuiScreen;
 
 public class GuiMainMenu extends GuiScreen
