@@ -38,6 +38,8 @@ public class Window
 	private int inputWidth, inputHeight;
 	private boolean maximized, resizeable;
 
+	private boolean[] mouseButtons;
+
 	/**
 	 * TODO: Null safety for the input methods!
 	 * 
@@ -52,6 +54,7 @@ public class Window
 		setupWindow(windowName, width, height, fullscreen, resizeable);
 		Display.create();
 		Keyboard.enableRepeatEvents(true);
+		this.mouseButtons = new boolean[Mouse.getButtonCount()];
 
 		// ----------------------------------------
 		// --- Last GL Setup before render loop ---
@@ -154,22 +157,38 @@ public class Window
 	{
 		if (Mouse.isCreated())
 		{
+			int button = Mouse.getEventButton();
+			if (button >= 0)
+			{
+				boolean stateOld = mouseButtons[button];
+				boolean stateNew = Mouse.getEventButtonState();
+				mouseButtons[button] = stateNew;
+				
+				if (stateOld != stateNew)
+				{
+					currentScreen.mouseClicked(Mouse.getX(), MouseUtil
+							.getInvertedMouseY(), button, stateNew ? GuiScreen.STATE_PRESSED : GuiScreen.STATE_RELEASE);
+				}
+				
+			}
+
 			/* Checks if the mouse has moved */
 			if (Mouse.getDX() > 0 || Mouse.getDY() > 0)
 			{
-				if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))
+				if (Mouse.isButtonDown(GuiScreen.BUTTON_LMB) || Mouse.isButtonDown(GuiScreen.BUTTON_RMB))
 					currentScreen.mouseDragging(Mouse.getX(), MouseUtil.getInvertedMouseY(),
-							Mouse.isButtonDown(0) ? 0 : 1);
+							Mouse.isButtonDown(0) ? GuiScreen.STATE_PRESSED : GuiScreen.STATE_RELEASE);
 			}
+
 			/* Checks if the Mouse has a wheel and if it has if it has been moved */
-			else if (Mouse.hasWheel())
+			if (Mouse.hasWheel())
 			{
 				int wheel = Mouse.getDWheel();
 
 				if (wheel < 0)
-					currentScreen.mouseScrollDecreased(wheel);
+					currentScreen.mouseScrollDecreased(Mouse.getX(), MouseUtil.getInvertedMouseY(), wheel);
 				else
-					currentScreen.mouseScrollIncreased(wheel);
+					currentScreen.mouseScrollIncreased(Mouse.getX(), MouseUtil.getInvertedMouseY(), wheel);
 			}
 
 		}
@@ -272,7 +291,7 @@ public class Window
 		if (currentScreen == null || guiScreen == null)
 			try
 			{ // tricking Java into thinking it's getting a non null object even though it is
-				// getting a null object :P
+				// getting null :P
 				guiScreen = (GuiScreen) default_Screen.getConstructors()[0].newInstance(GuiScreen.getEmptyGuiScreen());
 			}
 			catch (InstantiationException | IllegalAccessException | IllegalArgumentException

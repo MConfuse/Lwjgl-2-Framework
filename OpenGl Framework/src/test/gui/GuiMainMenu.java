@@ -2,14 +2,21 @@ package test.gui;
 
 import org.lwjgl.input.Keyboard;
 
+import de.confuse.openGL.font.FontUtils;
 import de.confuse.openGL.gui.GuiScreen;
+import de.confuse.openGL.gui.frame.elements.SwitchElement;
+import de.confuse.openGL.gui.frame.elements.TestElement;
 
 public class GuiMainMenu extends GuiScreen
 {
+	private final SwitchElement switchElement = new SwitchElement("TestSwitch", 10, 10, 50, 50, FontUtils.ARIAL_HALF);
 
 	public GuiMainMenu(GuiScreen parent)
 	{
 		super(parent);
+//		addElementToFrame(new TestElement("Test", 10, 10, 40, 60));
+		addElementToFrame(switchElement);
+		
 		System.out.println("Main Menu");
 	}
 
@@ -18,7 +25,9 @@ public class GuiMainMenu extends GuiScreen
 	{
 		fillBackground(0xFF303033);
 
-		arial.drawString("Hi my name is yeff", 100, 100, 0xFFFF0000);
+//		arial.drawString("Hi my name is yeff", 100, 100, 0xFFFF0000);
+
+		frame.drawElementsToScreen(dt, mouseX, mouseY);
 	}
 
 	@Override
@@ -34,13 +43,19 @@ public class GuiMainMenu extends GuiScreen
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int button, int state)
 	{
-
+		System.out.println("Click! " + button + " | " + state);
+		frame.mouseClicked(mouseX, mouseY, button, state);
 	}
 
 	@Override
 	public void screenRefocused()
 	{
 
+	}
+
+	@Override
+	public void mouseDragging(int mouseX, int mouseY, int button)
+	{
 	}
 
 }

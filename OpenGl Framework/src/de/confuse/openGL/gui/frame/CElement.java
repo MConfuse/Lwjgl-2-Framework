@@ -1,47 +1,44 @@
-package de.confuse.openGL.gui;
+package de.confuse.openGL.gui.frame;
 
 import org.lwjgl.input.Keyboard;
 
 import de.confuse.openGL.Window;
-import de.confuse.openGL.font.FontUtils;
-import de.confuse.openGL.gui.frame.CElement;
-import de.confuse.openGL.gui.frame.CFrame;
+import de.confuse.openGL.gui.Gui;
+import de.confuse.openGL.gui.GuiScreen;
 
-public abstract class GuiScreen extends Gui
+public abstract class CElement extends Gui
 {
-	/** Integer value for when the mouse button is released */
-	public static final int STATE_RELEASE = 0;
-	/** Integer value for when the mouse button is clicked */
-	public static final int STATE_PRESSED = 1;
-
-	/** Integer value equal to the left mouse button */
-	public static final int BUTTON_LMB = 0;
-	/** Integer value equal to the right mouse button */
-	public static final int BUTTON_RMB = 1;
-	/** Integer value equal to the middle mouse button */
-	public static final int BUTTON_MMB = 2;
-
-	// --- Pane framework ---
-	protected final CFrame frame = new CFrame(this);
-
-	protected final FontUtils arial = FontUtils.ARIAL;
 	protected final Window window = Window.get();
-	protected final GuiScreen parentScreen;
 
-	public GuiScreen(GuiScreen parent)
+	/** The Window name */
+	protected final String name;
+	protected final boolean automaticResize;
+
+	/* --- Window size --- */
+	protected int x, y;
+	protected int width, height;
+
+	public CElement(final String name, int x, int y, int width, int height)
 	{
-		this.parentScreen = parent;
+		this.name = name;
+		this.automaticResize = false;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
 
-		initGui();
+		initElement();
 	}
 
-	/**
-	 * Used to trick Java to get the {@link Window#default_Screen} to work :P.
-	 * 
-	 * @return null
-	 */
-	public static GuiScreen getEmptyGuiScreen()
-	{ return null; }
+	public CElement(final String name, int x, int y)
+	{
+		this.name = name;
+		this.automaticResize = true;
+		this.x = x;
+		this.y = y;
+
+		initElement();
+	}
 
 	/**
 	 * Called by the render loop whenever this {@link GuiScreen} is the
@@ -100,14 +97,22 @@ public abstract class GuiScreen extends Gui
 	public abstract void mouseClicked(int mouseX, int mouseY, int button, int state);
 
 	/**
-	 * Called any time this screen element is rendered again. This is only truly
-	 * reliable when using the {@link Window#displayGuiScreen(GuiScreen)} method as
-	 * you might forget to call the method in case of a custom system.<br>
-	 * <br>
-	 * I personally (currently) don't know how this might be useful but I
-	 * implemented it anyway just in case :).
+	 * Gets called when the element has been created and the
+	 * {@link #automaticResize} is enabled.
+	 * 
+	 * @return the {@link CElement}s width
+	 * @see #updateWindowSize()
 	 */
-	public abstract void screenRefocused();
+	protected abstract int getMaxWidth();
+
+	/**
+	 * Gets called when the element has been created and the
+	 * {@link #automaticResize} is enabled.
+	 * 
+	 * @return the {@link CElement}s height
+	 * @see #updateWindowSize()
+	 */
+	protected abstract int getMaxHeight();
 
 	/**
 	 * Fired when either {@link #BUTTON_LMB} or {@link #BUTTON_RMB} is pressed and
@@ -171,38 +176,34 @@ public abstract class GuiScreen extends Gui
 	{}
 
 	/**
-	 * Called by the {@link GuiScreen} constructor. You can use this method to
+	 * Called by the {@link CElement} constructor. You can use this method to
 	 * create objects using enormous nested loops and hide it somewhere at the
 	 * bottom of the Class where no one has to see it ever again :P.
 	 */
-	public void initGui()
+	public void initElement()
 	{}
+
+	public boolean isOverElement(int mouseX, int mouseY)
+	{
+		return (mouseX >= x && mouseY >= y && mouseX <= x + width && mouseY <= y + height);
+	}
 
 	/**
-	 * Called by {@link Window#displayGuiScreen(GuiScreen)} when closing a non null
-	 * {@link GuiScreen}. Basically, use this method to save content to disk or
-	 * finalizing executions. After this method has been called the
-	 * {@link GuiScreen} will no longer get any updated or calls to the overridden
-	 * methods.<br>
-	 * <strong>Note:</strong> The {@link GuiScreen} instance can still receive
-	 * updates through the new {@link GuiScreen} put into the
-	 * {@link Window#displayGuiScreen(GuiScreen)} method, this can, for example, be
-	 * used to keep a background rendered.<br>
-	 * This can be done by setting the {@link #parentScreen} of the new
-	 * {@link GuiScreen} put into the {@link Window#displayGuiScreen(GuiScreen)} to
-	 * this instance, and then calling the wanted functions through, for example,
-	 * {@link #parentScreen#update(float, int, int)}.
+	 * <strong>NOTE:</strong> Does nothing if {@link #automaticResize} is not
+	 * true!<br>
+	 * <br>
+	 * Calls both the {@link #getMaxWidth()} and {@link #getMaxHeight()} methods to
+	 * automatically set the width and height of the Element.
 	 */
-	public void onGuiClosed()
-	{}
-
-	// --------------------
-	// --- Screen Logic ---
-	// --------------------
-
-	public void addElementToFrame(CElement element)
+	public void updateWindowSize()
 	{
-		this.frame.addElement(element);
+//		int padding = 10;
+
+		if (!automaticResize)
+			return;
+
+		this.width = getMaxWidth();
+		this.height = getMaxHeight();
 	}
 
 	// ------------------------------
@@ -214,50 +215,34 @@ public abstract class GuiScreen extends Gui
 		Gui.drawRect(0, 0, window.getInputWidth(), window.getInputHeight(), color);
 	}
 
-	// ----------------------
-	// --- Static Helpers ---
-	// ----------------------
+	public int getX()
+	{ return x; }
 
-	/**
-	 * Easy method for streamlining the question if the mouse is inside the bounds
-	 * of your Object.
-	 * 
-	 * @param mouseX X-Position of the mouse
-	 * @param mouseY Y-Position of the mouse
-	 * @param x      Left most X-Position of the Object
-	 * @param width  The width of this Object (x + width = total width)
-	 * @param y      Top most Y-Position of the Object
-	 * @param height The height of this Object (y + height = total height)
-	 * @return true if the mouse is inside the specified bounds, false if it's not
-	 * @see #mouseOver(int, int, float, float, float, float)
-	 */
-	public static boolean mouseOver(int mouseX, int mouseY, int x, int width, int y, int height)
-	{
-		return mouseOver(mouseX, mouseY, (float) x, (float) width, (float) y, (float) height);
-	}
+	public void setX(int x)
+	{ this.x = x; }
 
-	/**
-	 * Easy method for streamlining the question if the mouse is inside the bounds
-	 * of your Object.
-	 * 
-	 * @param mouseX X-Position of the mouse
-	 * @param mouseY Y-Position of the mouse
-	 * @param x      Left most X-Position of the Object
-	 * @param width  The width of this Object (x + width = total width)
-	 * @param y      Top most Y-Position of the Object
-	 * @param height The height of this Object (y + height = total height)
-	 * @return true if the mouse is inside the specified bounds, false if it's not
-	 */
-	public static boolean mouseOver(int mouseX, int mouseY, float x, float width, float y, float height)
-	{
-		return ((mouseX * Window.scaleX) >= x && (mouseY * Window.scaleY) >= y && (mouseX * Window.scaleX) < x + width
-				&& (mouseY * Window.scaleY) < y + height);
-	}
+	public int getY()
+	{ return y; }
 
-	/**
-	 * @return the parentScreen
-	 */
-	public GuiScreen getParentScreen()
-	{ return parentScreen; }
+	public void setY(int y)
+	{ this.y = y; }
+
+	public int getWidth()
+	{ return width; }
+
+	public void setWidth(int width)
+	{ this.width = width; }
+
+	public int getHeight()
+	{ return height; }
+
+	public void setHeight(int height)
+	{ this.height = height; }
+
+	public String getName()
+	{ return name; }
+
+	public boolean isAutomaticResize()
+	{ return automaticResize; }
 
 }
