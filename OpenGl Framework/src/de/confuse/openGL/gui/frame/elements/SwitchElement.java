@@ -1,6 +1,7 @@
 package de.confuse.openGL.gui.frame.elements;
 
 import de.confuse.openGL.font.FontUtils;
+import de.confuse.openGL.gui.GuiScreen;
 import de.confuse.openGL.gui.frame.CElement;
 
 public class SwitchElement extends CElement
@@ -28,7 +29,7 @@ public class SwitchElement extends CElement
 	{
 		super(name, x, y, width, height);
 		this.font = font;
-
+		
 		// TODO: Minimum size algorithm
 	}
 
@@ -56,7 +57,10 @@ public class SwitchElement extends CElement
 
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int button, int state)
-	{}
+	{
+		if (state == GuiScreen.STATE_PRESSED)
+			this.enabled = !this.enabled;
+	}
 
 	@Override
 	protected int getMaxWidth()
@@ -68,8 +72,8 @@ public class SwitchElement extends CElement
 
 	private void drawIndicator(int mouseX, int mouseY)
 	{
-		this.enabled = false;
-		this.height = 40;
+//		this.enabled = false;
+//		this.height = 40;
 		this.offset = 8;
 		double radius = 14;
 		double diameter = 7D;

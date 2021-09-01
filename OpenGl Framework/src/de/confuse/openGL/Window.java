@@ -160,6 +160,9 @@ public class Window
 			int button = Mouse.getEventButton();
 			if (button >= 0)
 			{
+				if (button == 0)
+					button++;
+
 				boolean stateOld = mouseButtons[button];
 				boolean stateNew = Mouse.getEventButtonState();
 				mouseButtons[button] = stateNew;

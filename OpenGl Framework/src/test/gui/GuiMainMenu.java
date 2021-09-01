@@ -5,17 +5,18 @@ import org.lwjgl.input.Keyboard;
 import de.confuse.openGL.font.FontUtils;
 import de.confuse.openGL.gui.GuiScreen;
 import de.confuse.openGL.gui.frame.elements.SwitchElement;
-import de.confuse.openGL.gui.frame.elements.TestElement;
 
 public class GuiMainMenu extends GuiScreen
 {
 	private final SwitchElement switchElement = new SwitchElement("TestSwitch", 10, 10, 50, 50, FontUtils.ARIAL_HALF);
+	private final SwitchElement switchElement2 = new SwitchElement("TestSwitch2", 10, 100, 50, 50, FontUtils.ARIAL_HALF);	
 
 	public GuiMainMenu(GuiScreen parent)
 	{
 		super(parent);
 //		addElementToFrame(new TestElement("Test", 10, 10, 40, 60));
 		addElementToFrame(switchElement);
+		addElementToFrame(switchElement2);
 		
 		System.out.println("Main Menu");
 	}
