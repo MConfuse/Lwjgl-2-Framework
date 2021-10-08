@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import de.confuse.openGL.gui.Gui;
@@ -160,9 +161,6 @@ public class Window
 			int button = Mouse.getEventButton();
 			if (button >= 0)
 			{
-				if (button == 0)
-					button++;
-
 				boolean stateOld = mouseButtons[button];
 				boolean stateNew = Mouse.getEventButtonState();
 				mouseButtons[button] = stateNew;
@@ -213,12 +211,12 @@ public class Window
 //				try
 				{
 //					Display.setDisplayMode(new DisplayMode(this.width, this.height));
-					glViewport(0, 0, this.width, this.height);
-					Gui.pushAttrib();
-					Gui.pushMatrix();
+					GL11.glMatrixMode(GL_PROJECTION_MATRIX);
+					GL11.glLoadIdentity();
+//					glViewport(0, 0, this.width, this.height);
 					glOrtho(0, this.width, this.height, 0, 1, -1);
-					Gui.popAttrib();
-					Gui.popMatrix();
+					GL11.glMatrixMode(GL_MATRIX_MODE);
+					GL11.glLoadIdentity();
 				}
 //				catch (LWJGLException e)
 				{

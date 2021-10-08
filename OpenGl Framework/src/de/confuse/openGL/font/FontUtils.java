@@ -151,6 +151,9 @@ public class FontUtils
 		return this.unicodeFont.getHeight(s) / 2.0F;
 	}
 
+	public float getHeight()
+	{ return this.unicodeFont.getLineHeight() / 2f; }
+
 	public UnicodeFont getFont()
 	{ return this.unicodeFont; }
 }

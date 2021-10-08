@@ -9,7 +9,7 @@ public class Main
 	public Main() throws Exception
 	{
 		Window.default_Screen = GuiMainMenu.class;
-		Window.get("Test", 800, 600, false, false);
+		Window.get("Test", 800, 600, false, true);
 	}
 
 	public static void main(String[] args)
