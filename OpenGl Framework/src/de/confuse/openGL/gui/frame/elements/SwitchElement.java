@@ -49,8 +49,8 @@ public class SwitchElement extends CElement
 	@Override
 	public void update(float dt, int mouseX, int mouseY)
 	{
-//		drawRect(x, y, x + width, y + height, backgroundColor);
 		drawIndicator(mouseX, mouseY);
+//		drawRect(x, y, x + width, y + height, backgroundColor);
 	}
 
 	@Override
@@ -98,9 +98,6 @@ public class SwitchElement extends CElement
 
 	private void drawIndicator(int mouseX, int mouseY)
 	{
-		double radius = (this.height - 2) / 2;
-
-		
 //		this.enabled = false;
 //		this.height = 40;
 //		this.offset = 8;
