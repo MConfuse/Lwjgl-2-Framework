@@ -38,11 +38,11 @@ public class TestElement extends CElement
 	}
 
 	@Override
-	protected int getMaxWidth()
+	public int getMaxWidth()
 	{ return 0; }
 
 	@Override
-	protected int getMaxHeight()
+	public int getMaxHeight()
 	{ return 0; }
 
 }

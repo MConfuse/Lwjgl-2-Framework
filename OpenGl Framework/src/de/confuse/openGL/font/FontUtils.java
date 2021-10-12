@@ -112,7 +112,7 @@ public class FontUtils
 		GL11.glPopMatrix();
 	}
 
-	public void drawStringWidthShadow(String text, float x, float y, int color)
+	public void drawStringWithShadow(String text, float x, float y, int color)
 	{
 		drawString(text, x + 0.5F, y + 0.5D, 0);
 		drawString(text, x, y, color);
@@ -120,13 +120,13 @@ public class FontUtils
 
 	public void drawCenteredString(String text, float x, float y, int color)
 	{
-		drawString(text, x / 2.0F - getWidth(text) / 2.0F, y, color);
+		drawString(text, x - getWidth(text) / 2.0F, y, color);
 	}
 
-	public void drawCenteredStringWidthShadow(String text, float x, float y, int color)
+	public void drawCenteredStringWithShadow(String text, float x, float y, int color)
 	{
-		drawString(text, x + 0.5F, y + 0.5D, color);
-		drawString(text, x, y, color);
+		drawString(text, x - getWidth(text) / 2.0F + 0.5F, y + 0.5F, 0);
+		drawString(text, x - getWidth(text) / 2.0F, y, color);
 	}
 
 	public float getWidth(String s)
